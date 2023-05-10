@@ -154,8 +154,7 @@ lib.callback.register(
             end
         else
             local src = _
-            local materialItem =
-                exports.ox_inventory:GetItem(src, Config.Weed.WeedPick.Item, {}, Config.Weed.WeedProccess.ProccessItem)
+            local materialItem = exports.ox_inventory:GetItem(src, Config.Weed.WeedPick.Item, {}, Config.Weed.WeedProccess.ProccessItem)
             if materialItem ~= nil then
                 if materialItem then
                     return true
