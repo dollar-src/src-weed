@@ -7,7 +7,7 @@ for k,v in pairs(Config.Locations) do
         local coord = v[i]
         ZonesWeed[k][i] = lib.points.new({
             coords = coord,
-            distance = Config.Distance,
+            distance = 1,
             key = k,
             id = i,
         })
@@ -68,8 +68,10 @@ for k,v in pairs(Config.Locations) do
                                 },
                             }) 
                         then 
-                            TriggerServerEvent("src-weed:server:interact", self.key, self.id)
                             action = false
+                            if self.currentDistance < 2 then
+                                TriggerServerEvent("src-weed:server:interact", self.key, self.coords, self.id)
+                            end
                         else
                             action = false
                         end
@@ -91,7 +93,9 @@ for k,v in pairs(Config.Locations) do
                                 }) 
                             then 
                                 action = false
-                                TriggerServerEvent("src-weed:server:interact", self.key, self.id)    
+                                if self.currentDistance < 2 then
+                                    TriggerServerEvent("src-weed:server:interact", self.key, self.coords, self.id)
+                                end  
                             else
                                 action = false
                             end
