@@ -21,7 +21,7 @@ RegisterNetEvent('src-weed:server:interact', function(key, i)
     local coords = Config.Locations[key][i]
     local distance = #(pedCoords - coords)
 
-    if distance > Config.Distance then return DropPlayer(_source, Config.Ui.HackNotify.text) end
+    if distance > (Config.Distance + 1) then return DropPlayer(_source, Config.Ui.HackNotify.text) end
 
     if Config.Inventory == 'esx' then
         local player = Inventory.GetPlayerFromId(_source)
