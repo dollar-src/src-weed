@@ -1,170 +1,69 @@
-if Config.Core == "qb" then
-    Core = exports["qb-core"]:GetCoreObject()
-elseif Config.Core == "esx" then
-    Core = exports["es_extended"]:getSharedObject()
+local Config <const>, Inventory = require 'config'
+
+if Config.Inventory == "qb" then
+    Inventory = exports["qb-inventory"]
+elseif Config.Inventory == "esx" then
+    Inventory = exports["es_extended"]:getSharedObject()
+elseif Config.Inventory == "ox" then
+    Inventory = exports.ox_inventory
 end
 
-AddItem = function(src, item, count, metadata)
-    return exports.ox_inventory:AddItem(src, item, count, metadata)
+if not Inventory then
+    return error("Inventory script not found (esx/qb/ox)", 2)
 end
 
-RemoveItem = function(src, item, count, metadata)
-    return exports.ox_inventory:RemoveItem(src, item, count, metadata)
-end
+RegisterNetEvent('src-weed:server:interact', function(key, i)
+    local _source = source
+    if not i or not key then return DropPlayer(_source, Config.Ui.HackNotify.text) end
 
+    local ped = GetPlayerPed(_source)
+    local pedCoords = GetEntityCoords(ped)
+    local coords = Config.Locations[key][i]
+    local distance = #(pedCoords - coords)
 
-RegisterNetEvent(
-    "src-weed:collect",
-    function(key)
-        local _ = source
-        if key ~= nil then
-            if math.floor(key / 1000000000) >= 1 and math.floor(key / 1000000000) < 10 then
-                local src = source
-                local Player = Core.Functions.GetPlayer(src)
+    if distance > Config.Distance then return DropPlayer(_source, Config.Ui.HackNotify.text) end
 
-                if Player ~= nil then
-                    Player.Functions.AddItem(Config.Weed.WeedPick.Item, Config.Weed.WeedPick.amount)
-                    data = {
-                        id = Config.Ui.Notify.id,
-                        title = Config.Ui.Notify.title,
-                        description = Config.Ui.Notify.description,
-                        position = Config.Ui.Notify.position,
-                        style = {
-                            backgroundColor = Config.Ui.Notify.style.backgroundColor,
-                            color = Config.Ui.Notify.style.color
-                        },
-                        icon = Config.Ui.Notify.icon,
-                        iconColor = Config.Ui.Notify.iconColor
-                    }
-                    
-                    TriggerClientEvent('ox_lib:notify', source, data)
-                end
-            else
-                DropPlayer(_, Config.Ui.HackNotify.text)
-            end
-        else
-            DropPlayer(_, Config.Ui.HackNotify.text)
-        end
-    end
-)
-
-RegisterNetEvent(
-    "src-weed:proccess",
-    function(key)
-        local _= source
-        if Config.Core == "qb" then
-            if key ~= nil then
-
-                if math.floor(key / 1000000000) >= 1 and math.floor(key / 1000000000) < 10 then
-                    local src = source
-                    local Player = Core.Functions.GetPlayer(src)
-
-                    if Player ~= nil then
-                        Player.Functions.RemoveItem(Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem)
-                        Citizen.Wait(300)
-                        Player.Functions.AddItem(Config.Weed.WeedProccess.Item, Config.Weed.WeedProccess.amount)
-                        data = {
-                            id = Config.Ui.NotifyProccess.id,
-                            title = Config.Ui.NotifyProccess.title,
-                            description = Config.Ui.NotifyProccess.description,
-                            position = Config.Ui.NotifyProccess.position,
-                            style = {
-                                backgroundColor = Config.Ui.NotifyProccess.style.backgroundColor,
-                                color = Config.Ui.NotifyProccess.style.color
-                            },
-                            icon = Config.Ui.NotifyProccess.icon,
-                            iconColor = Config.Ui.NotifyProccess.iconColor
-                        }
-                        
-                        TriggerClientEvent('ox_lib:notify', src, data)
-                    end
+    if Config.Inventory == 'esx' then
+        local player = Inventory.GetPlayerFromId(_source)
+        if player then
+            if key == 'WeedLocations' then
+                if player.canCarryItem(Config.Weed.WeedPick.Item, Config.Weed.WeedPick.amount) then
+                    player.addInventoryItem(Config.Weed.WeedPick.Item, Config.Weed.WeedPick.amount)
+                    TriggerClientEvent('ox_lib:notify', _source, Config.Ui.Notify)
                 else
-                    DropPlayer(_, Config.Ui.HackNotify.text)
+                    TriggerClientEvent('ox_lib:notify', _source, Config.Ui.NotifyErrorFull)
                 end
-            else
-                DropPlayer(_, Config.Ui.HackNotify.text)
-            end
-        elseif Config.Core == "esx" then
-            local _ = source
-            if key ~= nil then
-                if math.floor(key / 1000000000) >= 1 and math.floor(key / 1000000000) < 10 then
-                    local src = source
-                    local Player = Core.GetPlayerFromId(src)
-
-                    if Player ~= nil then
-                        Player.removeInventoryItem(Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem)
-                        Citizen.Wait(300)
-                        Player.addInventoryItem(Config.Weed.WeedProccess.Item, Config.Weed.WeedProccess.amount)
-                    end
-                else
+            elseif key == 'Procces' then
+                if player.getInventoryItem(Config.Weed.WeedPick.Item).count < Config.Weed.WeedProccess.ProccessItem then
+                    return TriggerClientEvent('ox_lib:notify', _source, Config.Ui.NotifyError)
                 end
-            else
-            end
-        else
-            if key ~= nil then
-                if math.floor(key / 1000000000) >= 1 and math.floor(key / 1000000000) < 10 then
-                    local src = source
-                    local Player = Core.GetPlayerFromId(src)
-
-                    if Player ~= nil then
-                        RemoveItem(src, Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem)
-                        Citizen.Wait(300)
-                        AddItem(src, Config.Weed.WeedProccess.Item, Config.Weed.WeedProccess.amount, {})
-                    end
-                else
-                    DropPlayer(_, Config.Ui.HackNotify.text)
-
-                end
-            else
-                DropPlayer(_, Config.Ui.HackNotify.text)
+                player.removeInventoryItem(Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem)
+                Wait(300)
+                player.addInventoryItem(Config.Weed.WeedProccess.Item, Config.Weed.WeedProccess.amount)
+                TriggerClientEvent('ox_lib:notify', _source, Config.Ui.NotifyProccess)
             end
         end
-    end
-)
-
-lib.callback.register(
-    "src-weed:get",
-    function(_, cb)
-        if Config.Core == "qb" then
-            local src = _
-            local Player = Core.Functions.GetPlayer(src)
-            local materialItem = Player.Functions.GetItemByName(Config.Weed.WeedPick.Item)
-
-            if materialItem ~= nil then
-                if materialItem.amount >= Config.Weed.WeedProccess.ProccessItem then
-                    return true
-                else
-                    return false
-                end
+    else
+        if key == 'WeedLocations' then
+            if Inventory:AddItem(_source, Config.Weed.WeedPick.Item, Config.Weed.WeedPick.amount) then
+                TriggerClientEvent('ox_lib:notify', _source, Config.Ui.Notify)
             else
-                return false
+                TriggerClientEvent('ox_lib:notify', _source, Config.Ui.NotifyErrorFull)
             end
-        elseif Config.Core == "esx" then
-            local src = _
-            local Player = Core.GetPlayerFromId(src)
-            local materialItem = Player.getInventoryItem(Config.Weed.WeedPick.Item)
-            if materialItem ~= nil then
-                if materialItem.amount >= Config.Weed.WeedProccess.ProccessItem then
-                    return true
-                else
-                    return true
+        elseif key == 'Procces' then
+            if Config.Inventory == 'qb' then
+                if not Inventory:HasItem(_source, Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem) then
+                    return TriggerClientEvent('ox_lib:notify', _source, Config.Ui.NotifyError)
                 end
-            else
-                return false
-            end
-        else
-            local src = _
-            local materialItem = exports.ox_inventory:GetItem(src, Config.Weed.WeedPick.Item, {}, Config.Weed.WeedProccess.ProccessItem)
-            if materialItem ~= nil then
-                if materialItem then
-                    return true
-                else
-                    return true
+            elseif Config.Inventory == 'ox' then
+                if Inventory:GetItemCount(_source, Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem) < Config.Weed.WeedProccess.ProccessItem then
+                    return TriggerClientEvent('ox_lib:notify', _source, Config.Ui.NotifyError)
                 end
-            else
-                return false
             end
+            Inventory:RemoveItem(_source, Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem)
+            Wait(300)
+            Inventory:AddItem(_source, Config.Weed.WeedProccess.Item, Config.Weed.WeedProccess.amount)
+            TriggerClientEvent('ox_lib:notify', _source, Config.Ui.NotifyProccess)
         end
     end
-)
-
+end)
