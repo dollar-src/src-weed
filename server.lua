@@ -67,3 +67,20 @@ RegisterNetEvent('src-weed:server:interact', function(key, i)
         end
     end
 end)
+
+lib.callback.register('src-weed:callback:canProcess', function(source)
+    if Config.Inventory == 'qb' and Inventory:HasItem(source, Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem) then
+        return true
+    elseif Config.Inventory == 'ox' and (Inventory:GetItemCount(source, Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem) >= Config.Weed.WeedProccess.ProccessItem) then
+        return true
+    elseif Config.Inventory == 'esx' then
+        local player = Inventory.GetPlayerFromId(source)
+        if player then
+            if player.getInventoryItem(Config.Weed.WeedPick.Item).count >= Config.Weed.WeedProccess.ProccessItem then
+                return true
+            end
+        end 
+    end
+    TriggerClientEvent('ox_lib:notify', source, Config.Ui.NotifyError)
+    return false
+end)
