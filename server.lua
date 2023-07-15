@@ -12,13 +12,12 @@ if not Inventory then
     return error("Inventory script not found (esx/qb/ox)", 2)
 end
 
-RegisterNetEvent('src-weed:server:interact', function(key, i)
+RegisterNetEvent('src-weed:server:interact', function(key, coords, id)
     local _source = source
-    if not i or not key then return DropPlayer(_source, Config.Ui.HackNotify.text) end
+    if not id or not key or not coords then return DropPlayer(_source, Config.Ui.HackNotify.text) end
 
     local ped = GetPlayerPed(_source)
     local pedCoords = GetEntityCoords(ped)
-    local coords = Config.Locations[key][i]
     local distance = #(pedCoords - coords)
 
     if distance > (Config.Distance + 1) then return DropPlayer(_source, Config.Ui.HackNotify.text) end
@@ -56,7 +55,7 @@ RegisterNetEvent('src-weed:server:interact', function(key, i)
                     return TriggerClientEvent('ox_lib:notify', _source, Config.Ui.NotifyError)
                 end
             elseif Config.Inventory == 'ox' then
-                if Inventory:GetItemCount(_source, Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem) < Config.Weed.WeedProccess.ProccessItem then
+                if Inventory:GetItemCount(_source, Config.Weed.WeedPick.Item) < Config.Weed.WeedProccess.ProccessItem then
                     return TriggerClientEvent('ox_lib:notify', _source, Config.Ui.NotifyError)
                 end
             end
@@ -71,7 +70,7 @@ end)
 lib.callback.register('src-weed:callback:canProcess', function(source)
     if Config.Inventory == 'qb' and Inventory:HasItem(source, Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem) then
         return true
-    elseif Config.Inventory == 'ox' and (Inventory:GetItemCount(source, Config.Weed.WeedPick.Item, Config.Weed.WeedProccess.ProccessItem) >= Config.Weed.WeedProccess.ProccessItem) then
+    elseif Config.Inventory == 'ox' and (Inventory:GetItemCount(source, Config.Weed.WeedPick.Item) >= Config.Weed.WeedProccess.ProccessItem) then
         return true
     elseif Config.Inventory == 'esx' then
         local player = Inventory.GetPlayerFromId(source)
