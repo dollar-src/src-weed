@@ -65,12 +65,6 @@ Config.InteriorLocations = {
     Exit = vector3(412.28, 313.93, 103.02)
 }
 
-Config.Enter = {
-    {text = Config.Ui.DoorText.enter, status = "enter", coords = vec3(412.28, 313.93, 103.02)},
-    {text = Config.Ui.DoorText.exit, status = "exit", coords = vec3(1066.3, -3183.49, -39.16)}
-}
-
-
 Config.Ui = {
     Pick = {
         Text = "[E] - Collect",
@@ -163,6 +157,11 @@ Config.Ui = {
         enter = '[E] - Enter',
         exit = '[E] - Exit'
     }
+}
+
+Config.Enter = {
+    {text = Config.Ui.DoorText.enter, status = "enter", coords = vec3(412.28, 313.93, 103.02)},
+    {text = Config.Ui.DoorText.exit, status = "exit", coords = vec3(1066.3, -3183.49, -39.16)}
 }
 
 return Config
