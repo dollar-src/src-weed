@@ -1,4 +1,4 @@
-local Config = {}
+Config = {}
 
 Config.Inventory = (GetResourceState('ox_inventory') ~= 'missing' and 'ox') or (GetResourceState('qb-inventory') and 'qb') or (GetResourceState('es_extended') ~= 'missing' and 'esx')
 Config.Distance = 2

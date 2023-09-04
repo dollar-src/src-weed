@@ -1,4 +1,3 @@
-local Config <const> = require 'config'
 local ZonesWeed, Interior, action = {}, {}, false
 
 for k,v in pairs(Config.Locations) do

@@ -1,4 +1,3 @@
-local Config <const>, Inventory = require 'config'
 
 if Config.Inventory == "qb" then
     Inventory = exports["qb-inventory"]
